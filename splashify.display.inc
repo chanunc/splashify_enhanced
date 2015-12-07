@@ -35,6 +35,7 @@ function splashify_init() {
 
   $only_anonymous = $config['only_anonymous'];
   $when_frequency = $config['when_frequency'];
+  $when_frequency_custom_value = $config['$when_frequency_custom_value'];
   $where_page = $config['where_page'];
   $where_listpages = $config['where_listpages'];
   $where_opposite = $config['where_opposite'];
@@ -171,8 +172,8 @@ function splashify_init() {
 
   switch ($when_frequency) {
     case 'once':
-      // Set to expire in one year.
-      $js_expiretime = time() + (365 * 24 * 60 * 60);
+      // Set to expire in a month.
+      $js_expiretime = time() + (30 * 24 * 60 * 60);
       break;
 
     case 'daily':
@@ -189,6 +190,16 @@ function splashify_init() {
       // This should make the splash always show up on the next page load.
       $js_expiretime = time();
       $js_splash_always = TRUE;
+      break;
+
+    case 'minute':
+      // Set to expire in one year.
+      $js_expiretime = time() + (60);
+      break;
+
+    case 'custom':
+      // Set to expire by custom value.
+      $js_expiretime = time() + ($when_frequency_custom_value);
       break;
   }
 
@@ -410,6 +421,7 @@ function _splashify_get_config() {
   if (!$do_mobile) {
     // Get the desktop admin settings.
     $when_frequency = variable_get('splashify_when_desktop_frequency', 'never');
+    $when_frequency_custom_value = variable_get('splashify_when_desktop_frequency_custom_value', '');
     $where_page = variable_get('splashify_where_desktop_page', 'home');
     $where_listpages = variable_get('splashify_where_desktop_listpages', '');
     $where_opposite = variable_get('splashify_where_desktop_opposite', FALSE);
@@ -444,6 +456,7 @@ function _splashify_get_config() {
   return array(
     'only_anonymous' => $only_anonymous,
     'when_frequency' => $when_frequency,
+    '$when_frequency_custom_value' => $when_frequency_custom_value,
     'when_mobile_test' => $force_mobile,
     'when_roles' => $when_roles,
     'when_roles_options' => $when_roles_options,

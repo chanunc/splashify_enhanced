@@ -75,6 +75,7 @@ function splashify_uninstall() {
 
   // Desktop variables.
   variable_del('splashify_when_desktop_frequency');
+  variable_del('splashify_when_desktop_frequency_custom');
   variable_del('splashify_where_desktop_page');
   variable_del('splashify_where_desktop_listpages');
   variable_del('splashify_where_desktop_opposite');

@@ -51,13 +51,54 @@ function splashify_admin_when_form($form, &$form_state) {
     '#default_value' => variable_get('splashify_when_desktop_frequency', 'never'),
     '#options' => array(
       'never' => t('Never (off)'),
-      'always' => t('Always'),
-      'once' => t('Once'),
-      'daily' => t('Daily'),
+      'always' => t('Always on'),
+      'once' => t('Once a month'),
       'weekly' => t('Weekly'),
+      'daily' => t('Daily'),
+      'minute' => t('Every minute'),
+      'custom' => t('Custom'),
+    ),
+
+    '#ajax' => array(
+      'callback' => 'splashify_ajax_when_desktop_callback',
+      'wrapper' => 'when-desktop-custom-value',
+      'method' => 'replace',
+      'effect' => 'fade',
     ),
   );
   
+  // Set variables
+  // Retrieve splashify_when_desktop_frequency
+  if (isset($form_state['values']['splashify_when_desktop_frequency'])) {
+    $when_desktop_frequency = $form_state['values']['splashify_when_desktop_frequency'];
+  }else{
+    $when_desktop_frequency = variable_get('splashify_when_desktop_frequency', '');
+  }
+
+  //DEBUG
+  // dpm($when_desktop_frequency, 'when_desktop_frequency');
+
+  $splashify_when_desktop_frequency_custom_value = variable_get('splashify_when_desktop_frequency_custom_value', '');
+
+  // Begin of Custom value layout of splashify_when_desktop_frequency_custom_value
+  $form['desktop']['custom_value']['begin'] = array('#markup' => '<div id="when-desktop-custom-value">' );
+  
+  if ($when_desktop_frequency == 'custom') {
+    //Display custom value field
+    $form['desktop']['custom_value']['splashify_when_desktop_frequency_custom_value'] = array(
+      '#type' => 'textfield', 
+      '#title' => t('Custom frequency in seconds'), 
+      '#default_value' => ($splashify_when_desktop_frequency_custom_value), 
+    );
+  } 
+  else {
+    // remove custom_value if when_desktop_frequency change
+    // $splashify_when_desktop_frequency_custom_value = '';
+    variable_set('splashify_when_desktop_frequency_custom_value', '');
+  }
+  // End of layout
+  $form['desktop']['custom_value']['end'] = array('#markup' => '</div>');
+
   $form['roles'] = array(
     '#type' => 'fieldset',
     '#title' => t('Display for roles'),
@@ -174,4 +215,27 @@ function splashify_admin_when_form_submit($form, &$form_state) {
  */
 function splashify_ajax_when_mobile_callback($form, &$form_state) {
   return $form['mobile']['options'];
+}
+
+/**
+ * Ajax callback for Custom value
+ * @param  [type] $form        [description]
+ * @param  [type] &$form_state [description]
+ * @return [type]              [description]
+ */
+function splashify_ajax_when_desktop_callback($form, &$form_state) {
+  return $form['desktop']['custom_value'];
+}
+
+/**
+ * Form varidation for Custom value
+ * @param  [type] $form        [description]
+ * @param  [type] &$form_state [description]
+ * @return [type]              [description]
+ */
+function splashify_admin_when_form_validate($form, &$form_state){
+  if (!is_numeric($form_state['values']['splashify_when_desktop_frequency_custom_value']) 
+    && ($form_state['values']['splashify_when_desktop_frequency_custom_value'])!='' ) {
+    form_set_error('splashify_when_desktop_frequency_custom_value', t('Please specifi numeric value.'));
+  }
 }
